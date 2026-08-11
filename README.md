@@ -40,6 +40,31 @@ TaskFlow helps users organize daily work, manage priorities, track completion, a
 - Git
 - GitHub
 
+## 🔌 API Endpoints
+
+TaskFlow provides a RESTful API for managing tasks and retrieving productivity statistics.
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| `GET` | `/api/tasks` | Retrieve all tasks |
+| `POST` | `/api/tasks` | Create a new task |
+| `PUT` | `/api/tasks/<task_id>` | Update an existing task |
+| `PATCH` | `/api/tasks/<task_id>/complete` | Mark a task as completed |
+| `DELETE` | `/api/tasks/<task_id>` | Delete a task |
+| `GET` | `/api/stats` | Retrieve task statistics |
+
+### Example API Response
+
+```json
+{
+  "id": 1,
+  "title": "Complete project",
+  "category": "Project",
+  "priority": "High",
+  "due_date": "2026-08-15",
+  "completed": 0
+}
+
 ## 🏗️ Project Architecture
 
 ```text
@@ -69,3 +94,5 @@ TaskFlow/
     │
     └── js/
         └── app.js
+
+
