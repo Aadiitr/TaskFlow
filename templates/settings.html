@@ -1,0 +1,538 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Settings | TaskFlow</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+
+<body>
+
+<div class="app-shell">
+
+    <!-- SIDEBAR -->
+
+    <aside class="sidebar">
+
+        <div class="logo">
+            ⚡ Task<span>Flow</span>
+        </div>
+
+        <nav>
+
+            <a href="/">
+                📊 Dashboard
+            </a>
+
+            <a href="/tasks">
+                ✓ My Tasks
+            </a>
+
+            <a href="/analytics">
+                📈 Analytics
+            </a>
+
+            <a href="/settings" class="active">
+                ⚙️ Settings
+            </a>
+
+        </nav>
+
+    </aside>
+
+
+    <!-- MAIN CONTENT -->
+
+    <main class="main-content">
+
+        <div class="topbar">
+
+            <input
+                type="text"
+                class="search"
+                placeholder="Search tasks..."
+            >
+
+            <div class="user">
+                👤 Aditya
+            </div>
+
+        </div>
+
+
+        <!-- HEADER -->
+
+        <section class="page-header">
+
+            <div>
+
+                <h1>Settings</h1>
+
+                <p>
+                    Customize your TaskFlow experience.
+                </p>
+
+            </div>
+
+        </section>
+
+
+        <!-- PROFILE -->
+
+        <section class="settings-card">
+
+            <div class="settings-heading">
+
+                <div class="settings-icon">
+                    👤
+                </div>
+
+                <div>
+
+                    <h2>Profile</h2>
+
+                    <p>
+                        Manage your personal information.
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <div class="settings-form">
+
+                <div class="form-group">
+
+                    <label for="username">
+                        Display Name
+                    </label>
+
+                    <input
+                        type="text"
+                        id="username"
+                        value="Aditya"
+                        placeholder="Enter your name">
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label for="email">
+                        Email
+                    </label>
+
+                    <input
+                        type="email"
+                        id="email"
+                        value="aditya@example.com"
+                        placeholder="Enter your email">
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- APPEARANCE -->
+
+        <section class="settings-card">
+
+            <div class="settings-heading">
+
+                <div class="settings-icon">
+                    🎨
+                </div>
+
+                <div>
+
+                    <h2>Appearance</h2>
+
+                    <p>
+                        Choose how TaskFlow looks.
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <div class="setting-row">
+
+                <div>
+
+                    <strong>
+                        Dark Mode
+                    </strong>
+
+                    <p>
+                        Use a darker interface for comfortable viewing.
+                    </p>
+
+                </div>
+
+
+                <label class="toggle">
+
+                    <input
+                        type="checkbox"
+                        id="darkModeToggle">
+
+                    <span class="slider"></span>
+
+                </label>
+
+            </div>
+
+        </section>
+
+
+        <!-- NOTIFICATIONS -->
+
+        <section class="settings-card">
+
+            <div class="settings-heading">
+
+                <div class="settings-icon">
+                    🔔
+                </div>
+
+                <div>
+
+                    <h2>Notifications</h2>
+
+                    <p>
+                        Manage your notification preferences.
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <div class="setting-row">
+
+                <div>
+
+                    <strong>
+                        Task Reminders
+                    </strong>
+
+                    <p>
+                        Receive reminders about pending tasks.
+                    </p>
+
+                </div>
+
+
+                <label class="toggle">
+
+                    <input
+                        type="checkbox"
+                        id="notificationToggle"
+                        checked>
+
+                    <span class="slider"></span>
+
+                </label>
+
+            </div>
+
+        </section>
+
+
+        <!-- TASK PREFERENCES -->
+
+        <section class="settings-card">
+
+            <div class="settings-heading">
+
+                <div class="settings-icon">
+                    ⚙️
+                </div>
+
+                <div>
+
+                    <h2>Task Preferences</h2>
+
+                    <p>
+                        Set your default task options.
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <div class="settings-form">
+
+                <div class="form-group">
+
+                    <label for="defaultPriority">
+                        Default Priority
+                    </label>
+
+                    <select id="defaultPriority">
+
+                        <option value="Low">
+                            Low
+                        </option>
+
+                        <option value="Medium" selected>
+                            Medium
+                        </option>
+
+                        <option value="High">
+                            High
+                        </option>
+
+                    </select>
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label for="defaultCategory">
+                        Default Category
+                    </label>
+
+                    <select id="defaultCategory">
+
+                        <option value="General" selected>
+                            General
+                        </option>
+
+                        <option value="College">
+                            College
+                        </option>
+
+                        <option value="Internship">
+                            Internship
+                        </option>
+
+                        <option value="Project">
+                            Project
+                        </option>
+
+                        <option value="Personal">
+                            Personal
+                        </option>
+
+                    </select>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- SAVE -->
+
+        <div class="settings-actions">
+
+            <button
+                class="save-settings-btn"
+                onclick="saveSettings()">
+
+                Save Settings
+
+            </button>
+
+        </div>
+
+    </main>
+
+</div>
+
+
+<script>
+
+    /* =========================
+       LOAD SETTINGS
+       ========================= */
+
+    function loadSettings() {
+
+        const savedSettings =
+            JSON.parse(
+                localStorage.getItem("taskflowSettings")
+            ) || {};
+
+
+        if (savedSettings.username) {
+
+            document.getElementById(
+                "username"
+            ).value = savedSettings.username;
+
+        }
+
+
+        if (savedSettings.email) {
+
+            document.getElementById(
+                "email"
+            ).value = savedSettings.email;
+
+        }
+
+
+        if (savedSettings.priority) {
+
+            document.getElementById(
+                "defaultPriority"
+            ).value = savedSettings.priority;
+
+        }
+
+
+        if (savedSettings.category) {
+
+            document.getElementById(
+                "defaultCategory"
+            ).value = savedSettings.category;
+
+        }
+
+
+        document.getElementById(
+            "notificationToggle"
+        ).checked =
+            savedSettings.notifications !== false;
+
+
+        document.getElementById(
+            "darkModeToggle"
+        ).checked =
+            savedSettings.darkMode === true;
+
+
+        if (savedSettings.darkMode) {
+
+            document.body.classList.add(
+                "dark-mode"
+            );
+
+        }
+
+    }
+
+
+    /* =========================
+       SAVE SETTINGS
+       ========================= */
+
+    function saveSettings() {
+
+        const settings = {
+
+            username:
+                document
+                    .getElementById("username")
+                    .value
+                    .trim(),
+
+            email:
+                document
+                    .getElementById("email")
+                    .value
+                    .trim(),
+
+            priority:
+                document
+                    .getElementById("defaultPriority")
+                    .value,
+
+            category:
+                document
+                    .getElementById("defaultCategory")
+                    .value,
+
+            notifications:
+                document
+                    .getElementById("notificationToggle")
+                    .checked,
+
+            darkMode:
+                document
+                    .getElementById("darkModeToggle")
+                    .checked
+
+        };
+
+
+        localStorage.setItem(
+            "taskflowSettings",
+            JSON.stringify(settings)
+        );
+
+
+        applyDarkMode(
+            settings.darkMode
+        );
+
+
+        alert(
+            "Settings saved successfully!"
+        );
+
+    }
+
+
+    /* =========================
+       DARK MODE
+       ========================= */
+
+    function applyDarkMode(enabled) {
+
+        if (enabled) {
+
+            document.body.classList.add(
+                "dark-mode"
+            );
+
+        } else {
+
+            document.body.classList.remove(
+                "dark-mode"
+            );
+
+        }
+
+    }
+
+
+    document
+        .getElementById("darkModeToggle")
+        .addEventListener(
+            "change",
+            function() {
+
+                applyDarkMode(
+                    this.checked
+                );
+
+            }
+        );
+
+
+    /* =========================
+       INITIALIZE
+       ========================= */
+
+    loadSettings();
+
+</script>
+
+</body>
+
+</html>

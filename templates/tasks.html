@@ -1,0 +1,981 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>My Tasks | TaskFlow</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+
+<body>
+
+<div class="app-shell">
+
+    <!-- =========================
+         SIDEBAR
+         ========================= -->
+
+    <aside class="sidebar">
+
+        <div class="logo">
+            ⚡ Task<span>Flow</span>
+        </div>
+
+        <nav>
+
+            <a href="/">
+                📊 Dashboard
+            </a>
+
+            <a href="/tasks" class="active">
+                ✓ My Tasks
+            </a>
+
+            <a href="/analytics">
+            📈 Analytics
+            </a>
+
+            <a href="/settings">
+            ⚙️ Settings
+            </a>
+
+        </nav>
+
+    </aside>
+
+
+    <!-- =========================
+         MAIN CONTENT
+         ========================= -->
+
+    <main class="main-content">
+
+        <!-- TOP BAR -->
+
+        <div class="topbar">
+
+            <input
+                type="text"
+                id="searchInput"
+                class="search"
+                placeholder="Search tasks..."
+            >
+
+            <div class="user">
+                👤 Aditya
+            </div>
+
+        </div>
+
+
+        <!-- PAGE HEADER -->
+
+        <section class="page-header">
+
+            <div>
+
+                <h1>My Tasks</h1>
+
+                <p>
+                    Organize your work and stay productive. Apna kaam banta bhaad me jaye Janta
+                </p>
+
+            </div>
+
+            <a href="/" class="add-task-btn">
+                + Add Task
+            </a>
+
+        </section>
+
+
+        <!-- FILTERS -->
+
+        <div class="task-filters">
+
+            <button
+                class="filter-btn active"
+                data-filter="all">
+
+                All
+
+            </button>
+
+            <button
+                class="filter-btn"
+                data-filter="pending">
+
+                Pending
+
+            </button>
+
+            <button
+                class="filter-btn"
+                data-filter="completed">
+
+                Completed
+
+            </button>
+
+        </div>
+
+
+        <!-- TASK COUNT -->
+
+        <div class="task-summary">
+
+            <span id="taskCount">
+                Loading tasks...
+            </span>
+
+        </div>
+
+
+        <!-- TASK LIST -->
+
+        <section id="taskList" class="task-list">
+
+            <div class="loading">
+
+                Loading your tasks...
+
+            </div>
+
+        </section>
+
+    </main>
+
+</div>
+
+
+<!-- =========================
+     EDIT TASK MODAL
+     ========================= -->
+
+<div id="editModal" class="modal-overlay">
+
+    <div class="modal">
+
+        <!-- MODAL HEADER -->
+
+        <div class="modal-header">
+
+            <div>
+
+                <h2>Edit Task</h2>
+
+                <p>
+                    Update your task details.
+                </p>
+
+            </div>
+
+            <button
+                type="button"
+                class="close-btn"
+                onclick="closeEditModal()">
+
+                ×
+
+            </button>
+
+        </div>
+
+
+        <!-- EDIT FORM -->
+
+        <form id="editForm">
+
+            <!-- TITLE -->
+
+            <div class="form-group">
+
+                <label for="editTitle">
+                    Task Title
+                </label>
+
+                <input
+                    type="text"
+                    id="editTitle"
+                    placeholder="Enter task title"
+                    required>
+
+            </div>
+
+
+            <!-- CATEGORY + PRIORITY -->
+
+            <div class="form-row">
+
+                <div class="form-group">
+
+                    <label for="editCategory">
+                        Category
+                    </label>
+
+                    <select id="editCategory">
+
+                        <option value="General">
+                            General
+                        </option>
+
+                        <option value="College">
+                            College
+                        </option>
+
+                        <option value="Internship">
+                            Internship
+                        </option>
+
+                        <option value="Project">
+                            Project
+                        </option>
+
+                        <option value="Personal">
+                            Personal
+                        </option>
+
+                    </select>
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label for="editPriority">
+                        Priority
+                    </label>
+
+                    <select id="editPriority">
+
+                        <option value="Low">
+                            Low
+                        </option>
+
+                        <option value="Medium">
+                            Medium
+                        </option>
+
+                        <option value="High">
+                            High
+                        </option>
+
+                    </select>
+
+                </div>
+
+            </div>
+
+
+            <!-- DUE DATE -->
+
+            <div class="form-group">
+
+                <label for="editDueDate">
+                    Due Date
+                </label>
+
+                <input
+                    type="date"
+                    id="editDueDate">
+
+            </div>
+
+
+            <!-- ACTION BUTTONS -->
+
+            <div class="modal-actions">
+
+                <button
+                    type="button"
+                    class="cancel-btn"
+                    onclick="closeEditModal()">
+
+                    Cancel
+
+                </button>
+
+                <button
+                    type="submit"
+                    class="save-btn">
+
+                    Save Changes
+
+                </button>
+
+            </div>
+
+        </form>
+
+    </div>
+
+</div>
+
+
+<!-- =========================
+     JAVASCRIPT
+     ========================= -->
+
+<script>
+
+    let allTasks = [];
+
+    let currentFilter = "all";
+
+    let editingTaskId = null;
+
+
+    /* =========================
+       LOAD TASKS
+       ========================= */
+
+    async function loadTasks() {
+
+        try {
+
+            const response = await fetch("/api/tasks");
+
+
+            if (!response.ok) {
+
+                throw new Error(
+                    "Failed to fetch tasks"
+                );
+
+            }
+
+
+            allTasks = await response.json();
+
+            renderTasks();
+
+
+        } catch (error) {
+
+            console.error(error);
+
+
+            document.getElementById("taskList").innerHTML = `
+
+                <div class="empty-state">
+
+                    <div class="empty-icon">
+                        ⚠️
+                    </div>
+
+                    <h2>
+                        Unable to load tasks
+                    </h2>
+
+                    <p>
+                        Please make sure the Flask server is running.
+                    </p>
+
+                </div>
+
+            `;
+
+        }
+
+    }
+
+
+    /* =========================
+       RENDER TASKS
+       ========================= */
+
+    function renderTasks() {
+
+        const taskList =
+            document.getElementById("taskList");
+
+
+        const searchTerm =
+            document
+                .getElementById("searchInput")
+                .value
+                .toLowerCase()
+                .trim();
+
+
+        const filteredTasks = allTasks.filter(task => {
+
+            const title =
+                String(task.title || "")
+                    .toLowerCase();
+
+            const category =
+                String(task.category || "")
+                    .toLowerCase();
+
+
+            const matchesSearch =
+                title.includes(searchTerm) ||
+                category.includes(searchTerm);
+
+
+            const matchesFilter =
+                currentFilter === "all" ||
+
+                (
+                    currentFilter === "completed" &&
+                    Number(task.completed) === 1
+                ) ||
+
+                (
+                    currentFilter === "pending" &&
+                    Number(task.completed) === 0
+                );
+
+
+            return matchesSearch && matchesFilter;
+
+        });
+
+
+        /* TASK COUNT */
+
+        document.getElementById("taskCount").textContent =
+
+            `${filteredTasks.length} task${
+                filteredTasks.length !== 1 ? "s" : ""
+            }`;
+
+
+        /* EMPTY STATE */
+
+        if (filteredTasks.length === 0) {
+
+            taskList.innerHTML = `
+
+                <div class="empty-state">
+
+                    <div class="empty-icon">
+                        📝
+                    </div>
+
+                    <h2>
+                        No tasks found
+                    </h2>
+
+                    <p>
+                        Try changing your search or filter.
+                    </p>
+
+                </div>
+
+            `;
+
+            return;
+
+        }
+
+
+        /* TASK CARDS */
+
+        taskList.innerHTML = filteredTasks.map(task => {
+
+            const completed =
+                Number(task.completed) === 1;
+
+
+            const priority =
+                String(task.priority || "Medium");
+
+
+            const priorityClass =
+                priority.toLowerCase();
+
+
+            return `
+
+                <article
+                    class="task-item ${
+                        completed ? "completed" : ""
+                    }">
+
+
+                    <!-- COMPLETE -->
+
+                    <div class="task-check">
+
+                        <button
+                            class="check-button"
+                            onclick="completeTask(${task.id})"
+                            ${
+                                completed
+                                ? "disabled"
+                                : ""
+                            }>
+
+                            ${
+                                completed
+                                ? "✓"
+                                : "○"
+                            }
+
+                        </button>
+
+                    </div>
+
+
+                    <!-- TASK INFORMATION -->
+
+                    <div class="task-info">
+
+                        <h3>
+                            ${escapeHtml(task.title)}
+                        </h3>
+
+                        <p>
+
+                            ${escapeHtml(
+                                task.category || "General"
+                            )}
+
+                            •
+
+                            ${
+                                task.due_date
+                                ? escapeHtml(task.due_date)
+                                : "No deadline"
+                            }
+
+                        </p>
+
+                    </div>
+
+
+                    <!-- PRIORITY -->
+
+                    <div
+                        class="task-priority ${priorityClass}">
+
+                        ${escapeHtml(priority)}
+
+                    </div>
+
+
+                    <!-- ACTIONS -->
+
+                    <div class="task-actions">
+
+                        <button
+                            class="edit-button"
+                            onclick="editTask(${task.id})"
+                            title="Edit task">
+
+                            ✏️
+
+                        </button>
+
+
+                        <button
+                            class="delete-button"
+                            onclick="deleteTask(${task.id})"
+                            title="Delete task">
+
+                            🗑️
+
+                        </button>
+
+                    </div>
+
+
+                </article>
+
+            `;
+
+        }).join("");
+
+    }
+
+
+    /* =========================
+       COMPLETE TASK
+       ========================= */
+
+    async function completeTask(taskId) {
+
+        try {
+
+            const response = await fetch(
+                `/api/tasks/${taskId}/complete`,
+                {
+                    method: "PATCH"
+                }
+            );
+
+
+            if (!response.ok) {
+
+                throw new Error(
+                    "Could not complete task"
+                );
+
+            }
+
+
+            await loadTasks();
+
+
+        } catch (error) {
+
+            console.error(error);
+
+            alert(
+                "Could not complete the task."
+            );
+
+        }
+
+    }
+
+
+    /* =========================
+       DELETE TASK
+       ========================= */
+
+    async function deleteTask(taskId) {
+
+        const confirmed =
+            confirm(
+                "Are you sure you want to delete this task?"
+            );
+
+
+        if (!confirmed) {
+
+            return;
+
+        }
+
+
+        try {
+
+            const response = await fetch(
+                `/api/tasks/${taskId}`,
+                {
+                    method: "DELETE"
+                }
+            );
+
+
+            if (!response.ok) {
+
+                throw new Error(
+                    "Could not delete task"
+                );
+
+            }
+
+
+            await loadTasks();
+
+
+        } catch (error) {
+
+            console.error(error);
+
+            alert(
+                "Could not delete the task."
+            );
+
+        }
+
+    }
+
+
+    /* =========================
+       OPEN EDIT MODAL
+       ========================= */
+
+    function editTask(taskId) {
+
+        const task =
+            allTasks.find(
+                task => Number(task.id) === Number(taskId)
+            );
+
+
+        if (!task) {
+
+            console.error(
+                "Task not found:",
+                taskId
+            );
+
+            return;
+
+        }
+
+
+        editingTaskId = taskId;
+
+
+        document.getElementById(
+            "editTitle"
+        ).value = task.title || "";
+
+
+        document.getElementById(
+            "editCategory"
+        ).value = task.category || "General";
+
+
+        document.getElementById(
+            "editPriority"
+        ).value = task.priority || "Medium";
+
+
+        document.getElementById(
+            "editDueDate"
+        ).value = task.due_date || "";
+
+
+        document.getElementById(
+            "editModal"
+        ).classList.add("show");
+
+    }
+
+
+    /* =========================
+       CLOSE EDIT MODAL
+       ========================= */
+
+    function closeEditModal() {
+
+        document.getElementById(
+            "editModal"
+        ).classList.remove("show");
+
+
+        editingTaskId = null;
+
+    }
+
+
+    /* =========================
+       SAVE EDITED TASK
+       ========================= */
+
+    document.getElementById(
+        "editForm"
+    ).addEventListener(
+        "submit",
+        async function(event) {
+
+            event.preventDefault();
+
+
+            if (!editingTaskId) {
+
+                return;
+
+            }
+
+
+            const title =
+                document
+                    .getElementById("editTitle")
+                    .value
+                    .trim();
+
+
+            if (!title) {
+
+                alert(
+                    "Task title is required."
+                );
+
+                return;
+
+            }
+
+
+            const updatedTask = {
+
+                title: title,
+
+                category:
+                    document
+                        .getElementById("editCategory")
+                        .value,
+
+                priority:
+                    document
+                        .getElementById("editPriority")
+                        .value,
+
+                due_date:
+                    document
+                        .getElementById("editDueDate")
+                        .value || null
+
+            };
+
+
+            try {
+
+                const response = await fetch(
+                    `/api/tasks/${editingTaskId}`,
+                    {
+
+                        method: "PUT",
+
+                        headers: {
+                            "Content-Type":
+                                "application/json"
+                        },
+
+                        body:
+                            JSON.stringify(updatedTask)
+
+                    }
+                );
+
+
+                if (!response.ok) {
+
+                    const errorData =
+                        await response.json()
+                            .catch(() => ({}));
+
+
+                    throw new Error(
+                        errorData.error ||
+                        "Failed to update task"
+                    );
+
+                }
+
+
+                closeEditModal();
+
+                await loadTasks();
+
+
+            } catch (error) {
+
+                console.error(error);
+
+                alert(
+                    error.message ||
+                    "Could not update the task."
+                );
+
+            }
+
+        }
+    );
+
+
+    /* =========================
+       SEARCH
+       ========================= */
+
+    document
+        .getElementById("searchInput")
+        .addEventListener(
+            "input",
+            renderTasks
+        );
+
+
+    /* =========================
+       FILTERS
+       ========================= */
+
+    document
+        .querySelectorAll(".filter-btn")
+        .forEach(button => {
+
+            button.addEventListener(
+                "click",
+                function() {
+
+                    document
+                        .querySelectorAll(".filter-btn")
+                        .forEach(btn => {
+
+                            btn.classList.remove(
+                                "active"
+                            );
+
+                        });
+
+
+                    this.classList.add(
+                        "active"
+                    );
+
+
+                    currentFilter =
+                        this.dataset.filter;
+
+
+                    renderTasks();
+
+                }
+            );
+
+        });
+
+
+    /* =========================
+       ESCAPE HTML
+       ========================= */
+
+    function escapeHtml(value) {
+
+        const div =
+            document.createElement("div");
+
+
+        div.textContent =
+            String(value ?? "");
+
+
+        return div.innerHTML;
+
+    }
+
+
+    /* =========================
+       CLOSE MODAL ON OVERLAY CLICK
+       ========================= */
+
+    document
+        .getElementById("editModal")
+        .addEventListener(
+            "click",
+            function(event) {
+
+                if (
+                    event.target === this
+                ) {
+
+                    closeEditModal();
+
+                }
+
+            }
+        );
+
+
+    /* =========================
+       INITIAL LOAD
+       ========================= */
+
+    loadTasks();
+
+</script>
+
+</body>
+
+</html>
